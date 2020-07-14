@@ -96,18 +96,8 @@ export class VerifiableCredentialDoctype extends Doctype {
 
         const patch = jsonPatch.compare(doctype.content, newContent)
         const record: any = { owners: owners, content: patch, prev: doctype.head, id: doctype.state.log[0] }
-        record.iss = user.DID
-        // convert CID to string for signing
-        const tmpPrev = record.prev
-        const tmpId = record.id
-        record.prev = { '/': tmpPrev.toString() }
-        record.id = { '/': tmpId.toString() }
-        const jwt = await user.sign(record, { useMgmt: true})
-        const [header, payload, signature] = jwt.split('.') // eslint-disable-line @typescript-eslint/no-unused-vars
-        record.prev = tmpPrev
-        record.id = tmpId
 
-        return { ...record, header, signature }
+        return VerifiableCredentialDoctype._signRecord(record, user)
     }
 
     /**

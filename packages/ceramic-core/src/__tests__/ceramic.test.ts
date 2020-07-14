@@ -18,7 +18,7 @@ const genIpfsConf = (path, id): any => {
 }
 
 describe('Ceramic integration', () => {
-  jest.setTimeout(20000)
+  jest.setTimeout(240000)
   let ipfs1: Ipfs;
   let ipfs2: Ipfs;
   let ipfs3: Ipfs;
@@ -31,7 +31,7 @@ describe('Ceramic integration', () => {
   const DOCTYPE_TILE = 'tile'
   const DOCTYPE_3ID = '3id'
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     idWallet = new IdentityWallet(() => true, { seed })
     tmpFolder = await tmp.dir({ unsafeCleanup: true })
     ipfs1 = await Ipfs.create(genIpfsConf(tmpFolder.path, 0))
@@ -42,11 +42,11 @@ describe('Ceramic integration', () => {
     multaddr3 = (await ipfs3.id()).addresses[0].toString()
   })
 
-  afterAll(async () => {
+  afterEach(async () => {
     await ipfs1.stop()
     await ipfs2.stop()
     await ipfs3.stop()
-    tmpFolder.cleanup()
+    await tmpFolder.cleanup()
   })
 
   it('can propagate update across two connected nodes', async () => {

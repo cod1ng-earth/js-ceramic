@@ -1,6 +1,6 @@
 {
   "name": "@ceramicnetwork/ceramic-common",
-  "version": "1.0.1-alpha.0",
+  "version": "0.2.4",
   "description": "Ceramic common types and utilities",
   "keywords": [
     "ceramic",
@@ -18,7 +18,11 @@
     "lib"
   ],
   "scripts": {
-    "build": "../../node_modules/.bin/tsc -p tsconfig.json"
+    "build": "../../node_modules/.bin/tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build",
+    "prebuild": "npm run clean",
+    "lint": "./node_modules/.bin/eslint ./src --ext .js,.jsx,.ts,.tsx",
+    "clean": "rm -rf ./lib"
   },
   "dependencies": {
     "@types/lodash.clonedeep": "^4.5.6",
@@ -48,5 +52,6 @@
     "transformIgnorePatterns": [
       "/node_modules(?!/did-jwt)/"
     ]
-  }
+  },
+  "gitHead": "c58eb9659f5fdd976aca2db6465619c20ba30ff9"
 }
