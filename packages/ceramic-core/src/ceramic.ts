@@ -17,6 +17,7 @@ import { Resolver } from "did-resolver"
 import { TileDoctypeHandler } from "@ceramicnetwork/ceramic-doctype-tile"
 import { ThreeIdDoctypeHandler } from "@ceramicnetwork/ceramic-doctype-three-id"
 import { AccountLinkDoctypeHandler } from "@ceramicnetwork/ceramic-doctype-account-link"
+import { VerifiableCredentialDoctypeHandler } from "@ceramicnetwork/ceramic-doctype-verifiable-credential"
 import { DoctypeUtils } from "@ceramicnetwork/ceramic-common/lib"
 
 // This is temporary until we handle DIDs and in particular 3IDs better
@@ -56,7 +57,8 @@ class Ceramic implements CeramicApi {
     this._doctypeHandlers = {
       '3id': new ThreeIdDoctypeHandler(),
       'tile': new TileDoctypeHandler(),
-      'account-link': new AccountLinkDoctypeHandler()
+      'account-link': new AccountLinkDoctypeHandler(),
+      'verifiable-credential': new VerifiableCredentialDoctypeHandler()
     }
 
     this.pin = this._initPinApi();

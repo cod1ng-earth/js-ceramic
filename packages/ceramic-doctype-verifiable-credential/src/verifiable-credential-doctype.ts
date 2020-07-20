@@ -1,8 +1,10 @@
 import jsonPatch from 'fast-json-patch'
+import * as didJwt from 'did-jwt'
 
 import { Doctype, DoctypeConstructor, DoctypeStatic, InitOpts } from "@ceramicnetwork/ceramic-common"
 import { Context } from "@ceramicnetwork/ceramic-common"
 import { User } from "@ceramicnetwork/ceramic-common"
+import { JwtCredentialPayload, transformCredentialInput, validateJwtCredentialPayload } from 'did-jwt-vc'
 
 const DOCTYPE = 'verifiable-credential'
 
@@ -12,7 +14,10 @@ const DOCTYPE = 'verifiable-credential'
  * owners: List of owner Ids
  */
 export interface VerifiableCredentialParams {
-    content: object;
+    content: {
+        vcJwt: string
+        vcJwtHash?: string
+    }
     owners: Array<string>;
 }
 
@@ -54,26 +59,38 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param opts - Initialization options
      */
     static async makeGenesis(params: Record<string, any>, context? : Context, opts: InitOpts = {}): Promise<Record<string, any>> {
-        if (!context.user) {
+        if (context.user == null) {
             throw new Error('No user authenticated')
         }
 
-        let { owners } = params
-        const { content, contentHash } = params
+        const { content, owners } = params
 
         if (!owners) {
-            owners = [context.user.DID]
+            throw new Error('Owner needs to be specified')
         }
 
-        // TODO: Add other validations once finalized
+        if (!content) {
+            throw new Error('Content needs to be specified')
+        }
 
-        const record = {
+        const vcPayload: JwtCredentialPayload = content
+        const parsedPayload: JwtCredentialPayload = { iat: undefined, iss: context.user.DID, ...transformCredentialInput(vcPayload) }
+        validateJwtCredentialPayload(parsedPayload)
+        
+        console.log(parsedPayload)
+        const jwt = await context.user.signEncoded(parsedPayload, { useMgmt: true })
+        console.log(jwt)
+
+        const cid = await context.ipfs.dag.put(jwt)
+
+        return {
             doctype: DOCTYPE,
             owners,
-            content
+            content: {
+                vcJwt: jwt,
+                vcJwtHash: cid.toString()
+            }
         }
-
-        return VerifiableCredentialDoctype._signRecord(record, context.user)
     }
 
     /**
