@@ -33,6 +33,7 @@
     "@ceramicnetwork/ceramic-doctype-account-link": "^0.2.4",
     "@ceramicnetwork/ceramic-doctype-three-id": "^0.2.4",
     "@ceramicnetwork/ceramic-doctype-tile": "^0.2.4",
+    "@ceramicnetwork/ceramic-doctype-verifiable-credential": "file:../ceramic-doctype-verifiable-credential",
     "@ethersproject/base64": "^5.0.0-beta.134",
     "@ethersproject/providers": "^5.0.0-beta.144",
     "@ethersproject/random": "^5.0.0-beta.136",

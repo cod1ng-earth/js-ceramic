@@ -69,14 +69,13 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
      * @param context - Ceramic context
      */
     async _applyGenesis(record: any, cid: CID, context: Context): Promise<DocState> {
-        await this._verifyRecordSignature(record, context)
         // TODO - verify genesis record
         return {
             doctype: DOCTYPE,
             owners: record.owners,
             content: record.content,
             nextContent: null,
-            signature: SignatureStatus.SIGNED,
+            signature: SignatureStatus.GENESIS,
             anchorStatus: AnchorStatus.NOT_REQUESTED,
             log: [cid]
         }
