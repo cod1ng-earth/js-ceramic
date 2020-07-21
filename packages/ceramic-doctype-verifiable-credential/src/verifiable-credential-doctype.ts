@@ -25,7 +25,7 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param params - Change parameters
      * @param opts - Initialization options
      */
-    async change(params: VerifiableCredentialParams, opts?: DocOpts): Promise<void> {
+    async change(params: Record<string, any>, opts?: DocOpts): Promise<void> {
         const { content, owners } = params
         const updateRecord = await VerifiableCredentialDoctype._makeRecord(this, this.context, content, owners)
         const updated = await this.context.api.applyRecord(this.id, updateRecord)
@@ -38,7 +38,7 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param context - Ceramic context
      * @param opts - Initialization options
      */
-    static async create(params: VerifiableCredentialParams, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
+    static async create(params: Record<string, any>, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
         if (context.user == null) {
             throw new Error('No user authenticated')
         }
@@ -72,7 +72,7 @@ export class VerifiableCredentialDoctype extends Doctype {
         return {
             doctype: DOCTYPE,
             owners,
-            content: VerifiableCredentialDoctype._getContent(content, context)
+            content: await VerifiableCredentialDoctype._getContent(content, context)
         }
     }
 
@@ -100,7 +100,7 @@ export class VerifiableCredentialDoctype extends Doctype {
 
         return {
             owners: owners,
-            content: VerifiableCredentialDoctype._getContent(newContent, context),
+            content: await VerifiableCredentialDoctype._getContent(newContent, context),
             prev: doctype.head,
             id: doctype.state.log[0]
         }

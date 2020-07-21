@@ -35,7 +35,7 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
      * @param context - Ceramic context
      * @param opts - Initialization option
      */
-    async create(params: VerifiableCredentialParams, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
+    async create(params: Record<string, any>, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
         return VerifiableCredentialDoctype.create(params, context, opts)
     }
 
