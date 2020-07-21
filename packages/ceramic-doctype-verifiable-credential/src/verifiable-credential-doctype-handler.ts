@@ -93,14 +93,14 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
             throw new Error(`Invalid docId ${record.id}, expected ${state.log[0]}`)
         }
 
-        await this._verifyRecordSignature(record, context)
+        //await this._verifyRecordSignature(record, context)
         state.log.push(cid)
 
         return {
             ...state,
             signature: SignatureStatus.SIGNED,
             anchorStatus: AnchorStatus.NOT_REQUESTED,
-            nextContent: jsonpatch.applyPatch(state.content, record.content).newDocument
+            nextContent: record.content
         }
     }
 
