@@ -6,7 +6,7 @@ import jsonpatch from 'fast-json-patch'
 
 import { VerifiableCredentialDoctype, VerifiableCredentialParams } from "./verifiable-credential-doctype"
 import {
-    AnchorProof, AnchorRecord, AnchorStatus, DocState, DoctypeConstructor, DoctypeHandler, InitOpts, SignatureStatus
+    AnchorProof, AnchorRecord, AnchorStatus, DocState, DoctypeConstructor, DoctypeHandler, DocOpts, SignatureStatus
 } from "@ceramicnetwork/ceramic-common"
 import { Context } from "@ceramicnetwork/ceramic-common"
 
@@ -37,7 +37,7 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
      * @param context - Ceramic context
      * @param opts - Initialization option
      */
-    async create(params: VerifiableCredentialParams, context: Context, opts?: InitOpts): Promise<VerifiableCredentialDoctype> {
+    async create(params: VerifiableCredentialParams, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
         return VerifiableCredentialDoctype.create(params, context, opts)
     }
 
@@ -56,7 +56,7 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
 
         if (record.proof) {
             const proofRecord = (await context.ipfs.dag.get(record.proof)).value;
-            return this._applyAnchor(record, proofRecord, cid, state)
+            return this._applyAnchor(record, proofRecord, cid, state);
         }
 
         return this._applySigned(record, cid, state, context)
