@@ -2,11 +2,9 @@ import CID from 'cids'
 
 import * as didJwt from 'did-jwt'
 
-import jsonpatch from 'fast-json-patch'
-
 import { VerifiableCredentialDoctype, VerifiableCredentialParams } from "./verifiable-credential-doctype"
 import {
-    AnchorProof, AnchorRecord, AnchorStatus, DocState, DoctypeConstructor, DoctypeHandler, InitOpts, SignatureStatus
+    AnchorProof, AnchorRecord, AnchorStatus, DocState, DoctypeConstructor, DoctypeHandler, DocOpts, SignatureStatus
 } from "@ceramicnetwork/ceramic-common"
 import { Context } from "@ceramicnetwork/ceramic-common"
 
@@ -37,7 +35,7 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
      * @param context - Ceramic context
      * @param opts - Initialization option
      */
-    async create(params: VerifiableCredentialParams, context: Context, opts?: InitOpts): Promise<VerifiableCredentialDoctype> {
+    async create(params: VerifiableCredentialParams, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
         return VerifiableCredentialDoctype.create(params, context, opts)
     }
 

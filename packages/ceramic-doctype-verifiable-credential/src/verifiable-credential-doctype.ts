@@ -1,4 +1,4 @@
-import { Doctype, DoctypeConstructor, DoctypeStatic, InitOpts } from "@ceramicnetwork/ceramic-common"
+import { Doctype, DoctypeConstructor, DoctypeStatic, DocOpts } from "@ceramicnetwork/ceramic-common"
 import { Context } from "@ceramicnetwork/ceramic-common"
 import { JwtCredentialPayload, transformCredentialInput, validateJwtCredentialPayload } from 'did-jwt-vc'
 
@@ -25,7 +25,7 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param params - Change parameters
      * @param opts - Initialization options
      */
-    async change(params: VerifiableCredentialParams, opts?: InitOpts): Promise<void> {
+    async change(params: VerifiableCredentialParams, opts?: DocOpts): Promise<void> {
         const { content, owners } = params
         const updateRecord = await VerifiableCredentialDoctype._makeRecord(this, this.context, content, owners)
         const updated = await this.context.api.applyRecord(this.id, updateRecord)
@@ -38,7 +38,7 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param context - Ceramic context
      * @param opts - Initialization options
      */
-    static async create(params: VerifiableCredentialParams, context: Context, opts?: InitOpts): Promise<VerifiableCredentialDoctype> {
+    static async create(params: VerifiableCredentialParams, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
         if (context.user == null) {
             throw new Error('No user authenticated')
         }
@@ -54,7 +54,7 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param context - Ceramic context
      * @param opts - Initialization options
      */
-    static async makeGenesis(params: Record<string, any>, context? : Context, opts: InitOpts = {}): Promise<Record<string, any>> {
+    static async makeGenesis(params: Record<string, any>, context? : Context, opts: DocOpts = {}): Promise<Record<string, any>> {
         if (context.user == null) {
             throw new Error('No user authenticated')
         }
