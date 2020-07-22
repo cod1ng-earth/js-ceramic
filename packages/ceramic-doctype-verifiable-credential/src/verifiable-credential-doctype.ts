@@ -1,7 +1,6 @@
 import { Doctype, DoctypeConstructor, DoctypeStatic, DocOpts } from "@ceramicnetwork/ceramic-common"
 import { Context } from "@ceramicnetwork/ceramic-common"
 import { JwtCredentialPayload, transformCredentialInput, validateJwtCredentialPayload } from 'did-jwt-vc'
-import { parse } from "path"
 
 const DOCTYPE = 'verifiable-credential'
 

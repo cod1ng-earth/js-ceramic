@@ -54,7 +54,7 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
 
         if (record.proof) {
             const proofRecord = (await context.ipfs.dag.get(record.proof)).value;
-            return this._applyAnchor(record, proofRecord, cid, state)
+            return this._applyAnchor(record, proofRecord, cid, state);
         }
 
         return this._applySigned(record, cid, state, context)
