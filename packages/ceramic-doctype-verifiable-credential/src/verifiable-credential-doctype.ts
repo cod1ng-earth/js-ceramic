@@ -1,6 +1,7 @@
 import { Doctype, DoctypeConstructor, DoctypeStatic, DocOpts } from "@ceramicnetwork/ceramic-common"
 import { Context } from "@ceramicnetwork/ceramic-common"
 import { JwtCredentialPayload, transformCredentialInput, validateJwtCredentialPayload } from 'did-jwt-vc'
+import { parse } from "path"
 
 const DOCTYPE = 'verifiable-credential'
 
@@ -69,10 +70,12 @@ export class VerifiableCredentialDoctype extends Doctype {
             throw new Error('Content needs to be specified')
         }
 
+        let jwtContent = await VerifiableCredentialDoctype._getContent(content, context)
+
         return {
             doctype: DOCTYPE,
             owners,
-            content: await VerifiableCredentialDoctype._getContent(content, context)
+            content: jwtContent
         }
     }
 
@@ -98,9 +101,11 @@ export class VerifiableCredentialDoctype extends Doctype {
             throw new Error('New content needs to be specified')
         }
 
+        let jwtContent = await VerifiableCredentialDoctype._getContent(newContent, context)
+
         return {
             owners: owners,
-            content: await VerifiableCredentialDoctype._getContent(newContent, context),
+            content: jwtContent,
             prev: doctype.head,
             id: doctype.state.log[0]
         }
@@ -111,8 +116,12 @@ export class VerifiableCredentialDoctype extends Doctype {
         const parsedPayload: JwtCredentialPayload = { iat: undefined, iss: context.user.DID, ...transformCredentialInput(vcPayload) }
         validateJwtCredentialPayload(parsedPayload)
 
+        console.log(parsedPayload)
+
         const jwt = await context.user.signContent(parsedPayload, { useMgmt: true })
         const cid = await context.ipfs.dag.put(jwt)
+
+        console.log(jwt)
 
         return {
             vcJwt: jwt,

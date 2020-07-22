@@ -38,6 +38,7 @@ export default class CeramicUser implements User {
   }
 
   async signContent (content: any, opts: any = {}): Promise<string> {
+    content = sortPropertiesDeep(content)
     return this._callRpc('3id_signClaim', { content, did: this._did, useMgmt: opts.useMgmt })
   }
 
