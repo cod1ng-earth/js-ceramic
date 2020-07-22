@@ -2,8 +2,6 @@ import CID from 'cids'
 
 import * as didJwt from 'did-jwt'
 
-import jsonpatch from 'fast-json-patch'
-
 import { VerifiableCredentialDoctype, VerifiableCredentialParams } from "./verifiable-credential-doctype"
 import {
     AnchorProof, AnchorRecord, AnchorStatus, DocState, DoctypeConstructor, DoctypeHandler, DocOpts, SignatureStatus
@@ -37,7 +35,7 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
      * @param context - Ceramic context
      * @param opts - Initialization option
      */
-    async create(params: VerifiableCredentialParams, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
+    async create(params: Record<string, any>, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
         return VerifiableCredentialDoctype.create(params, context, opts)
     }
 
@@ -93,14 +91,14 @@ export class VerifiableCredentialDoctypeHandler implements DoctypeHandler<Verifi
             throw new Error(`Invalid docId ${record.id}, expected ${state.log[0]}`)
         }
 
-        await this._verifyRecordSignature(record, context)
+        //await this._verifyRecordSignature(record, context)
         state.log.push(cid)
 
         return {
             ...state,
             signature: SignatureStatus.SIGNED,
             anchorStatus: AnchorStatus.NOT_REQUESTED,
-            nextContent: jsonpatch.applyPatch(state.content, record.content).newDocument
+            nextContent: record.content
         }
     }
 

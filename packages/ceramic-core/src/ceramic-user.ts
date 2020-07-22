@@ -37,8 +37,9 @@ export default class CeramicUser implements User {
     this._did = did
   }
 
-  async signEncoded (payload: any, opts: any = {}): Promise<string> {
-    return this._callRpc('3id_signClaim', { payload, did: this._did, useMgmt: opts.useMgmt })
+  async signContent (content: any, opts: any = {}): Promise<string> {
+    content = sortPropertiesDeep(content)
+    return this._callRpc('3id_signClaim', { content, did: this._did, useMgmt: opts.useMgmt })
   }
 
   async sign (payload: any, opts: any = {}): Promise<string> {

@@ -1,9 +1,5 @@
-import jsonPatch from 'fast-json-patch'
-import * as didJwt from 'did-jwt'
-
 import { Doctype, DoctypeConstructor, DoctypeStatic, DocOpts } from "@ceramicnetwork/ceramic-common"
 import { Context } from "@ceramicnetwork/ceramic-common"
-import { User } from "@ceramicnetwork/ceramic-common"
 import { JwtCredentialPayload, transformCredentialInput, validateJwtCredentialPayload } from 'did-jwt-vc'
 
 const DOCTYPE = 'verifiable-credential'
@@ -29,10 +25,10 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param params - Change parameters
      * @param opts - Initialization options
      */
-    async change(params: VerifiableCredentialParams, opts: DocOpts = {}): Promise<void> {
+    async change(params: Record<string, any>, opts?: DocOpts): Promise<void> {
         const { content, owners } = params
-        const updateRecord = await VerifiableCredentialDoctype._makeRecord(this, this.context.user, content, owners)
-        const updated = await this.context.api.applyRecord(this.id, updateRecord, opts)
+        const updateRecord = await VerifiableCredentialDoctype._makeRecord(this, this.context, content, owners)
+        const updated = await this.context.api.applyRecord(this.id, updateRecord)
         this.state = updated.state
     }
 
@@ -42,7 +38,7 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param context - Ceramic context
      * @param opts - Initialization options
      */
-    static async create(params: VerifiableCredentialParams, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
+    static async create(params: Record<string, any>, context: Context, opts?: DocOpts): Promise<VerifiableCredentialDoctype> {
         if (context.user == null) {
             throw new Error('No user authenticated')
         }
@@ -73,23 +69,12 @@ export class VerifiableCredentialDoctype extends Doctype {
             throw new Error('Content needs to be specified')
         }
 
-        const vcPayload: JwtCredentialPayload = content
-        const parsedPayload: JwtCredentialPayload = { iat: undefined, iss: context.user.DID, ...transformCredentialInput(vcPayload) }
-        validateJwtCredentialPayload(parsedPayload)
-        
-        console.log(parsedPayload)
-        const jwt = await context.user.signEncoded(parsedPayload, { useMgmt: true })
-        console.log(jwt)
-
-        const cid = await context.ipfs.dag.put(jwt)
+        let jwtContent = await VerifiableCredentialDoctype._getContent(content, context)
 
         return {
             doctype: DOCTYPE,
             owners,
-            content: {
-                vcJwt: jwt,
-                vcJwtHash: cid.toString()
-            }
+            content: jwtContent
         }
     }
 
@@ -100,8 +85,8 @@ export class VerifiableCredentialDoctype extends Doctype {
      * @param newContent - New content
      * @param newOwners - New owners
      */
-    static async _makeRecord(doctype: Doctype, user: User, newContent: any, newOwners?: string[]): Promise<any> {
-        if (user == null) {
+    static async _makeRecord(doctype: Doctype, context: Context, newContent: any, newOwners?: string[]): Promise<any> {
+        if (context.user == null) {
             throw new Error('No user authenticated')
         }
 
@@ -111,40 +96,35 @@ export class VerifiableCredentialDoctype extends Doctype {
             owners = doctype.owners
         }
 
-        const patch = jsonPatch.compare(doctype.content, newContent)
-        const record: any = { owners: owners, content: patch, prev: doctype.head, id: doctype.state.log[0] }
+        if (!newContent) {
+            throw new Error('New content needs to be specified')
+        }
 
-        return VerifiableCredentialDoctype._signRecord(record, user)
+        let jwtContent = await VerifiableCredentialDoctype._getContent(newContent, context)
+
+        return {
+            owners: owners,
+            content: jwtContent,
+            prev: doctype.head,
+            id: doctype.state.log[0]
+        }
     }
 
-    /**
-     * Sign Verifiable Credential Record
-     * @param record - Record to be signed
-     * @param user - User instance
-     */
-    static async _signRecord(record: any, user: User): Promise<any> {
-        if (user == null) {
-            throw new Error('No user authenticated')
-        }
+    static async _getContent(content: any, context: Context): Promise<any> {
+        const vcPayload: JwtCredentialPayload = content
+        const parsedPayload: JwtCredentialPayload = { iat: undefined, iss: context.user.DID, ...transformCredentialInput(vcPayload) }
+        validateJwtCredentialPayload(parsedPayload)
 
-        record.iss = user.DID
-        // convert CID to string for signing
-        const tmpCID = record.prev
-        const tmpId = record.id
-        if (tmpCID) {
-            record.prev = { '/': tmpCID.toString() }
+        console.log(parsedPayload)
+
+        const jwt = await context.user.signContent(parsedPayload, { useMgmt: true })
+        const cid = await context.ipfs.dag.put(jwt)
+
+        console.log(jwt)
+
+        return {
+            vcJwt: jwt,
+            vcJwtHash: cid.toString()
         }
-        if (tmpId) {
-            record.id = { '/': tmpId.toString() }
-        }
-        const jwt = await user.sign(record)
-        const [header, payload, signature] = jwt.split('.') // eslint-disable-line @typescript-eslint/no-unused-vars
-        if (tmpCID) {
-            record.prev = tmpCID
-        }
-        if (tmpId) {
-            record.id = tmpId
-        }
-        return { ...record, header, signature }
     }
 }

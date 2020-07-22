@@ -21,9 +21,10 @@
   },
   "dependencies": {
     "3id-blockchain-utils": "^0.4.0",
-    "@ceramicnetwork/ceramic-common": "^0.2.4",
+    "@ceramicnetwork/ceramic-common": "^0.2.5",
     "@types/lodash.clonedeep": "^4.5.6",
     "did-jwt": "^4.0.0",
+    "did-jwt-vc": "^1.0.4",
     "did-resolver": "^2.0.1"
   },
   "devDependencies": {
@@ -38,7 +39,6 @@
     "@typescript-eslint/eslint-plugin": "^2.19.0",
     "@typescript-eslint/parser": "^2.19.0",
     "babel-jest": "^25.1.0",
-    "did-jwt-vc": "^1.0.3",
     "eslint": "^6.8.0",
     "eslint-plugin-jest": "^23.8.2",
     "identity-wallet": "1.2.0-ceramic.1",
